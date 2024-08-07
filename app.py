@@ -1,6 +1,10 @@
 from flask import Flask
 
-app = Flasl(__name__)
+app = Flask(__name__)
 
 if __name__ == "__main__":
     app.run()
+
+@app.route("/")
+def home():
+    return "Welcome to my Reassessment!"
