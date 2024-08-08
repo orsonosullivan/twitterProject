@@ -1,16 +1,16 @@
-import tweepy
-import configparser
+import tweepy 
+import config
+import pandas as pd
 
-#read configs 
-config = configparser.ConfigParser()
-config.read('config.ini')
+client = tweepy.Client(bearer_token=config.BEARER_TOKEN)
 
-api_key = config['twitter']['api_key']
-api_key_secret = config['twitter']['api_secret_key']
-access_token = config['twitter']['access_token']
-access_token_secret = config['twitter']['access_token_secret']
-bearer_token = config['twitter']['bearer_token']
+query = 'dublin'
 
-#authentication 
-client = tweepy.Client(bearer_token)
-print(bearer_token)
+response = client.search_recent_tweets(query=query, max_results=10)
+
+columns = ['ID', 'Text']
+data = []
+for tweet in response:
+    data.append(tweet)
+
+print(response)
