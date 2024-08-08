@@ -9,21 +9,14 @@ load_dot_env()
 
 app = Flask(__name__)
 
-app.config["TWITTER_CLIENT_ID"] = os.getenv("TWITTER_CLIENT_ID")
-app.config["TWITTER_CLIENT_SECRET"] = os.getenv("TWITTER_CLIENT_SECRET")
-app.config["TWITTER_DOMAIN"] = os.getenv("TWITTER_DOMAIN")
-app.config["TWITTER_CALLBACK_URL"] = os.getenv("TWITTER_CALLBACK_URL")
+#Twitter endpoints for 0Auth2
+authorize_url = "https://twitter.com/i/oauth2/authorize"
+token_url = "https://api.twitter.com/2/oauth2/token"
+user_info_url = "https://api.x.com/2/me"
 
-oauth = OAuth(app)
-
-twitter = oauth.register(
-    'twitter',client_id=app.config['TWITTER_CLIENT_ID'],
-    client_secret=app.config['TWITTER_CLIENT_SECRET'],
-    authorize_url='https://x.com/i/oauth2/authorize',
-    authorize_params=None,
-    access_token_url='https://api.x.com/2/oauth2/token',
-    access_token_params=None,client_kwargs={'scope': 'tweet.read users.read offline.access'}
-)
+client_id = os.getenv('TWITTER_CLIENT_ID')
+client_secret = os.getenv('TWITTER_CLIENT_SECRET')
+redirect_uri = os.getenv("TWITTER_CALLBACK_URL")
 
 #search function using tweepy 
 def process_query(query):
@@ -34,6 +27,12 @@ def process_query(query):
 
     print (tweet_texts)
     return f"Processed tweets: {tweet_texts}"
+
+#login page
+@app.route('/login')
+def login():
+    return twitter.authorize_redirect(redirect_uri=app.config["TWITTER_CALLBACK_URL"])
+
 
 #landing page 
 @app.route("/")
