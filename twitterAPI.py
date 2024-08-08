@@ -1,6 +1,10 @@
 from flask import Flask, redirect, url_for, render_template, request
+from authlib.integration.flask_client import OAuth
+from dotenv import load_dotenv
 import tweepy 
 import config
+
+load_dot_env()
 
 app = Flask(__name__)
 
@@ -19,6 +23,8 @@ def process_query(query):
     client = tweepy.Client(bearer_token=config.BEARER_TOKEN)
     response = client.search_recent_tweets(query=query, max_results=10)
     tweet_texts = [tweet.text for tweet in response.data]
+    tweet_texts = str_replace_all(tweets_list, "[\r\n]" , "")
+
     print (tweet_texts)
     return f"Processed tweets: {tweet_texts}"
 
