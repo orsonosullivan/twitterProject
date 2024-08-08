@@ -1,11 +1,18 @@
-from flask import Flask, redirect, url_for, render_template, request
-from authlib.integration.flask_client import OAuth
+from flask import Flask, redirect, url_for, render_template, request, session
+#from authlib.integration.flask_client import OAuth
 from dotenv import load_dotenv
 import tweepy 
 import config
 import os
+import hashlib
+import requests
 
-load_dot_env()
+load_dotenv()
+
+client_id = os.getenv('TWITTER_CLIENT_ID')
+client_secret = os.getenv('TWITTER_CLIENT_SECRET')
+redirect_uri = os.getenv("TWITTER_CALLBACK_URL")
+
 
 app = Flask(__name__)
 
@@ -14,9 +21,16 @@ authorize_url = "https://twitter.com/i/oauth2/authorize"
 token_url = "https://api.twitter.com/2/oauth2/token"
 user_info_url = "https://api.x.com/2/me"
 
-client_id = os.getenv('TWITTER_CLIENT_ID')
-client_secret = os.getenv('TWITTER_CLIENT_SECRET')
-redirect_uri = os.getenv("TWITTER_CALLBACK_URL")
+
+#From auth0 docs:
+def code_verification():
+    code_verification = secrets.token_urlsafe(128)
+    return code_verifier
+
+#From authO docs: create code challenge: Generate a code_challenge from the code_verifier that will be sent to Auth0 to request an authorization_code
+def code_challenger():
+    code_challenger = base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest()).rstrip(b'=').decode('utf-8')
+    return code_challenge
 
 #search function using tweepy 
 def process_query(query):
@@ -37,6 +51,9 @@ def login():
 #landing page 
 @app.route("/")
 def home():
+    code_verifier = generate_code_verifier()
+    code_challenge = generate_code_challenge(code_verifier)
+
     return render_template("welcomepage.html")
 
 #search function
