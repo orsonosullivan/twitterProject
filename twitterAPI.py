@@ -14,9 +14,19 @@ tweet_texts = [tweet.text for tweet in response.data]
 
 print(tweet_texts)
 
+
+
 @app.route("/")
 def home():
     return render_template("welcomepage.html")
+
+
+@approute('/search', methods=['POST'])
+def search():
+    searchTerm = request.form['query']
+    result = process_query(query)
+    return render_template('result.html', query=query,result=result)
+
 
 if __name__ == "__main__":
     app.run()
