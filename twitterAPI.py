@@ -3,6 +3,7 @@ from authlib.integration.flask_client import OAuth
 from dotenv import load_dotenv
 import tweepy 
 import config
+import os
 
 load_dot_env()
 
@@ -14,6 +15,15 @@ app.config["TWITTER_DOMAIN"] = os.getenv("TWITTER_DOMAIN")
 app.config["TWITTER_CALLBACK_URL"] = os.getenv("TWITTER_CALLBACK_URL")
 
 oauth = OAuth(app)
+
+twitter = oauth.register(
+    'twitter',client_id=app.config['TWITTER_CLIENT_ID'],
+    client_secret=app.config['TWITTER_CLIENT_SECRET'],
+    authorize_url='https://x.com/i/oauth2/authorize',
+    authorize_params=None,
+    access_token_url='https://api.x.com/2/oauth2/token',
+    access_token_params=None,client_kwargs={'scope': 'tweet.read users.read offline.access'}
+)
 
 #search function using tweepy 
 def process_query(query):
