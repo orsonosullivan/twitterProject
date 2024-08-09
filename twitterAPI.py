@@ -112,6 +112,16 @@ def fetch_reverse_chronological_timeline(access_token, user_id):
         print(f"Response Header: {response.headers}")
         print(f"Response Body: {response.text}")
         return None
+    
+def summarize_tweets(tweets):
+    tweets_text = " ".join(tweets)
+    model = "gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are designed to drill down to the context of tweets, summarise the topics under discussion and present it to the end user as summaries"},
+        {"role": "user", "content": f"drill down to the context of the following tweets, summarise the topics under discussion and present it to the end user as summaries"}]
+    
+    summary = response['choices'][0]['message']['content'].strip()
+    return summary.split('\n')
 
 if __name__ == "__main__":
     app.run(debug=True)
