@@ -88,10 +88,10 @@ def callback():
     timeline_data = fetch_reverse_chronological_timeline(session['access_token'], user_info['data']['id'])
 
     if timeline_data:
-        tweets=[tweet['text'] for tweet in timeline_data['data']]
-        tweet_summaries = summarize_tweets(tweets)
-        #confusing but splits by 1./2./3. etc instead of \n
-        summaries = re.split(r'\d+\.\s', tweet_summaries)[1:]
+        tweets = [tweet['text'] for tweet in timeline_data['data']]
+        tweets_summarised = summarize_tweets(tweets)
+        summaries = tweets_summarised.split('\n')
+        summaries = [summary for summary in summaries if summary] 
         return render_template('summary.html', summaries=summaries)
 
     else:
@@ -146,6 +146,7 @@ def summarize_tweets(tweets):
     #get just the gpt response from object
     tweets_summarised = response.choices[0].message.content
  
+    print(tweets_summarised)
     return tweets_summarised
     
 if __name__ == "__main__":
