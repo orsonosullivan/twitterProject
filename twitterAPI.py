@@ -61,7 +61,8 @@ def callback():
     code_verifier = session.get("code_verifier")
 
     if not code or not code_verifier:
-        return "Error: Missing code or code_verifier", 400
+        error_description = token_json.get("error_description", "Unknown error")
+        return f"Error: Could not obtain access token - {error_description}", 400
 
     # Exchange the authorization code for an access token
     token_data = {
@@ -74,8 +75,7 @@ def callback():
 
     token_response = requests.post(token_url, data=token_data)
     token_json = token_response.json()
-    print(token_response)
-
+    
     if "access_token" not in token_json:
         return "Error: Could not obtain access token", 400
 
