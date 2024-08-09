@@ -13,7 +13,7 @@ load_dotenv()
 
 client_id = os.getenv('TWITTER_CLIENT_ID')
 client_secret = os.getenv('TWITTER_CLIENT_SECRET')
-redirect_uri = os.getenv("TWITTER_CALLBACK_URL")
+redirect_uri = os.getenv("TWITTER_CALLBACK_URI")
 
 
 app = Flask(__name__)
@@ -23,12 +23,12 @@ app.secret_key = os.urandom(24)
 #Twitter endpoints for 0Auth2
 authorize_url = "https://twitter.com/i/oauth2/authorize"
 token_url = "https://api.twitter.com/2/oauth2/token"
-user_info_url = "https://api.x.com/2/me"
+user_info_url = "https://api.twitter.com/2/users/me"
 
 #login page
-@app.route('/login')
-def login():
-    return twitter.authorize_redirect(redirect_uri=app.config["TWITTER_CALLBACK_URL"])
+#@app.route('/login')
+#def login():
+#   return twitter.authorize_redirect(redirect_uri=app.config["TWITTER_CALLBACK_URL"])
 
 #landing page 
 @app.route("/")
@@ -38,7 +38,7 @@ def home():
     session['code_verifier'] = code_verifier
 
     params = {
-        "response_type:": "code",
+        "response_type": "code",
         "client_id": client_id,
         "redirect_uri": redirect_uri,
         "scope": "tweet.read users.read",
@@ -61,10 +61,10 @@ def callback():
 
     # Exchange the authorization code for an access token
     token_data = {
-        "client_id": CLIENT_ID,
+        "client_id": client_id,
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": REDIRECT_URI,
+        "redirect_uri": redirect_uri,
         "code_verifier": code_verifier
     }
 
@@ -82,7 +82,6 @@ def callback():
     user_info = user_info_response.json()
 
     return f"Hello, {user_info['data']['name']}!"
-
 
 #search function
 @app.route('/search', methods=['POST'])
@@ -105,7 +104,7 @@ def process_query(query):
     client = tweepy.Client(bearer_token=config.BEARER_TOKEN)
     response = client.search_recent_tweets(query=query, max_results=10)
     tweet_texts = [tweet.text for tweet in response.data]
-    tweet_texts = str_replace_all(tweets_list, "[\r\n]" , "")
+    tweet_texts = [tweet.replace("\r", "").replace("\n", "") for tweet in tweet_texts]
 
     print (tweet_texts)
     return f"Processed tweets: {tweet_texts}"
