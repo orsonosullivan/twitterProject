@@ -75,7 +75,13 @@ def callback():
     user_info_response = requests.get(user_info_url, headers=headers)
     user_info = user_info_response.json()
 
-    return f"Hello, {user_info['data']['name']}! Welcome to your Tweet Summariser"
+    timeline_data = fetch_reverse_chronological_timeline(session['access_token'], user_info['data']['id'])
+
+    if timeline_data:
+        tweets=[tweet['text'] for tweet in timeline_data['data']]
+        return f"Recent Tweets:<br>" + "<br>".join(tweets)
+    else:
+        return "Failed to fetch home timeline"
 
 def code_verification():
     code_verifier = secrets.token_urlsafe(128)
@@ -85,13 +91,26 @@ def code_challenger(code_verifier):
     code_challenge = base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest()).rstrip(b'=').decode('utf-8')
     return code_challenge
 
-#search function using tweepy 
-def get_user_timeline():
-    client = tweepy.Client(token['access_token'])
-    response = clientget_home_timeline(max_results=10)
-    tweet_texts = [tweet.text for tweet in response.data]
-    tweet_texts = [tweet.replace("\r", "").replace("\n", "") for tweet in tweet_texts]
-    return f"Processed tweets: {tweet_texts}"
+def fetch_reverse_chronological_timeline(access_token, user_id):
+    url = f"https://api.twitter.com/2/users/{user_id}/timelines/reverse_chronological"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    
+    params = {
+        "max_results": 10,
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Error: {response.status_code}")
+        print(f"Response Header: {response.headers}")
+        print(f"Response Body: {response.text}")
+        return None
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
