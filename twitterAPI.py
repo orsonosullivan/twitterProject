@@ -7,13 +7,14 @@ import hashlib
 import requests
 import secrets
 import base64
-import openai
+from openai import OpenAI
 
 load_dotenv()
 
 client_id = os.getenv('TWITTER_CLIENT_ID')
 client_secret = os.getenv('TWITTER_CLIENT_SECRET')
 redirect_uri = os.getenv("TWITTER_CALLBACK_URI")
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 
@@ -80,7 +81,8 @@ def callback():
 
     if timeline_data:
         tweets=[tweet['text'] for tweet in timeline_data['data']]
-        return f"Recent Tweets:<br>" + "<br>".join(tweets)
+        test_tweets= summarize_tweets(tweets)
+        return f"<h1>Summary of Recent Tweets:</h1><p>{test_tweets}</p>"
     else:
         return "Failed to fetch home timeline"
 
@@ -114,14 +116,23 @@ def fetch_reverse_chronological_timeline(access_token, user_id):
         return None
     
 def summarize_tweets(tweets):
-    tweets_text = " ".join(tweets)
-    model = "gpt-4o-mini",
-    messages=[
-        {"role": "system", "content": "You are designed to drill down to the context of tweets, summarise the topics under discussion and present it to the end user as summaries"},
-        {"role": "user", "content": f"drill down to the context of the following tweets, summarise the topics under discussion and present it to the end user as summaries"}]
-    
-    summary = response['choices'][0]['message']['content'].strip()
-    return summary.split('\n')
 
+    client = OpenAI(api_key=openai_api_key)
+    tweets_text = " ".join(tweets)
+    GPT_MODEL = "gpt-4o"
+ 
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": f"drill down to the context of those tweets, summarise the topics under discussion and present to the end user as summaries: {tweets}"}
+    ]
+    response = client.chat.completions.create(
+        model=GPT_MODEL,
+        messages=messages,
+        temperature=0
+    )
+    tweets_summarised = response.choices[0].message.content
+ 
+    return tweets_summarised
+    
 if __name__ == "__main__":
     app.run(debug=True)
