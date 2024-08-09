@@ -15,6 +15,10 @@ client_id = os.getenv('TWITTER_CLIENT_ID')
 client_secret = os.getenv('TWITTER_CLIENT_SECRET')
 redirect_uri = os.getenv("TWITTER_CALLBACK_URI")
 
+print(f"Client ID: {client_id}")
+print(f"Client Secret: {client_secret}")  # Be cautious with printing secrets in production
+print(f"Redirect URI: {redirect_uri}")
+
 
 app = Flask(__name__)
 
@@ -68,8 +72,9 @@ def callback():
         "code_verifier": code_verifier
     }
 
-    token_response = requests.post(TOKEN_URL, data=token_data)
+    token_response = requests.post(token_url, data=token_data)
     token_json = token_response.json()
+    print(token_response)
 
     if "access_token" not in token_json:
         return "Error: Could not obtain access token", 400
@@ -101,7 +106,7 @@ def code_challenger(code_verifier):
 
 #search function using tweepy 
 def process_query(query):
-    client = tweepy.Client(bearer_token=config.BEARER_TOKEN)
+    client = tweepy.Client(token['access_token'])
     response = client.search_recent_tweets(query=query, max_results=10)
     tweet_texts = [tweet.text for tweet in response.data]
     tweet_texts = [tweet.replace("\r", "").replace("\n", "") for tweet in tweet_texts]
