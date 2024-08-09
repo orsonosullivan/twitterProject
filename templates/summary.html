@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweet Summaries</title>
+</head>
+<body>
+    <h1>Summary of Recent Tweets</h1>
+    {% for summary in summaries %}
+        <div class="summary">
+            <p>{{ summary }}</p>
+        </div>
+    {% endfor %}
+</body>
+</html>

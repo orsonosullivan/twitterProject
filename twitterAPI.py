@@ -82,8 +82,11 @@ def callback():
 
     if timeline_data:
         tweets=[tweet['text'] for tweet in timeline_data['data']]
-        test_tweets= summarize_tweets(tweets)
-        return f"<h1>Summary of Recent Tweets:</h1><p>{test_tweets}</p>"
+        tweet_summaries = summarize_tweets(tweets)
+        print(tweet_summaries)
+        summaries = re.split(r'\d+\.\s', tweet_summaries)[1:]
+        print(summaries)
+        return render_template('summary.html', summaries=summaries)
     else:
         return "Failed to fetch home timeline"
 
@@ -107,7 +110,6 @@ def fetch_reverse_chronological_timeline(access_token, user_id):
     }
 
     response = requests.get(url, headers=headers, params=params)
-
     if response.status_code == 200:
         return response.json()
     else:
