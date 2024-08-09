@@ -7,6 +7,7 @@ import hashlib
 import requests
 import secrets
 import base64
+import openai
 
 load_dotenv()
 
