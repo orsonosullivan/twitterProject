@@ -8,6 +8,7 @@ import requests
 import secrets
 import base64
 from openai import OpenAI
+import re
 
 load_dotenv()
 
@@ -123,7 +124,7 @@ def summarize_tweets(tweets):
  
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": f"drill down to the context of those tweets, summarise the topics under discussion and present to the end user as summaries: {tweets}"}
+        {"role": "user", "content": f"drill down to the context of those tweets, summarise the topics under discussion and present to the end user as summaries. I would like just the summary, No : No ** no usernames no titles or flairs or anything like that, just the summary text: {tweets}"}
     ]
     response = client.chat.completions.create(
         model=GPT_MODEL,
